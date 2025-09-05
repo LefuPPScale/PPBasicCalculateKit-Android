@@ -79,46 +79,15 @@ dependencies {
 
 }
 
-// 添加JAR打包任务
-task jar(type: Jar) {
-    dependsOn 'compileReleaseJavaWithJavac'
-    from(fileTree(dir: 'build/intermediates/javac/release/classes')) {
-        exclude 'META-INF/**'
-    }
-    from(fileTree(dir: 'src/main/assets')) {
-        into 'assets'
-    }
-//    // 添加libs目录下的JAR文件内容
-//    from(zipTree('libs/bluetoothkit-1.5.4.jar')) {
-//        exclude 'META-INF/**'
-//    }
-    // 完全排除META-INF目录
-    exclude 'META-INF/**'
-    archiveFileName = "${project.name}-${version}.jar"
-    destinationDirectory = file('build/libs')
-    // 禁用MANIFEST.MF生成
-    metaInf {
-        exclude '**'
-    }
-    doLast {
-        // 在JAR包生成后删除META-INF目录
-        def jarFile = archiveFile.get().asFile
-        if (jarFile.exists()) {
-            exec {
-                commandLine 'zip', '-d', jarFile.absolutePath, 'META-INF/*'
-                ignoreExitValue = true
-            }
-        }
-    }
-}
+// JAR打包任务已移除，改为使用AAR
 
 // 配置发布
 afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                // 发布JAR文件而不是AAR
-                artifact jar
+                // 发布AAR文件，不包含sources
+                artifact("$buildDir/outputs/aar/${ARTIFACT_ID}-${LIB_VERSION}.aar")
 
                 // 自定义你的包信息
                 groupId = GROUP_ID
