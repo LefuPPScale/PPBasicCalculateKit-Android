@@ -1,24 +1,24 @@
-package com.lefu.htcalculatekit.calculate
+package com.lefu.ppbasecalculatekit.calculate
 
-import com.besthealth.bh5BodyComposition.BhBody270
+import com.besthealth.bh2BodyComposition.BhBody270
+import com.besthealth.bh2BodyComposition.BuildConfig
 import com.besthealth.bh5BodyComposition.BhErrorType
-import com.besthealth.bh5BodyComposition.BhSex
-import com.besthealth.bh5BodyComposition.BuildConfig
-import com.lefu.htcalculatekit.BodyFatCalculateHelper
-import com.lefu.htcalculatekit.BodyFatErrorType
-import com.lefu.htcalculatekit.HTBodyBaseModel
-import com.lefu.htcalculatekit.HTBodyFatModel
-import com.lefu.htcalculatekit.assignHTBodyBaseModelToBodyFatModel
-import com.lefu.htcalculatekit.createList
+import com.besthealth.bhBodyComposition.BhSex
+import com.lefu.ppbasecalculatekit.BodyFatCalculateHelper
+import com.lefu.ppbasecalculatekit.BodyFatErrorType
+import com.lefu.ppbasecalculatekit.HTBodyBaseModel
+import com.lefu.ppbasecalculatekit.HTBodyFatModel
+import com.lefu.ppbasecalculatekit.assignHTBodyBaseModelToBodyFatModel
+import com.lefu.ppbasecalculatekit.createList
 
-object CalculateHelper8 {
+object CalculateHelper8_172 {
 
     /**
-     * 8电极算法-使用新版本的算法，
+     * 8电极算法 使用固定V1.7.2版本的算法，
      *
      * @param bodyFatModel
      */
-    fun calculateTypeAlternate8(bodyBaseModel: HTBodyBaseModel, product: Int): HTBodyFatModel {
+    fun calcuteTypeAlternate8(bodyBaseModel: HTBodyBaseModel, product: Int): HTBodyFatModel {
         val bodyFatModel = HTBodyFatModel()
         assignHTBodyBaseModelToBodyFatModel(bodyBaseModel, bodyFatModel)
         bodyBaseModel?.let {
@@ -29,7 +29,7 @@ object CalculateHelper8 {
             body.bhAge = bodyBaseModel.age
             body.bhHeightCm = bodyBaseModel.height * 1.0f
             body.bhWeightKg = bodyFatModel.ppWeightKg
-            body.bhSex = if (bodyBaseModel.sex == 1) com.besthealth.bhBodyComposition.BhSex.MALE.ordinal else com.besthealth.bhBodyComposition.BhSex.FEMALE.ordinal
+            body.bhSex = if (bodyBaseModel.sex == 1) BhSex.MALE.ordinal else BhSex.FEMALE.ordinal
 
             body.bhProduct = product
             body.bhTrimming = 1.0f
@@ -57,7 +57,7 @@ object CalculateHelper8 {
             System.out.println("體重(Kg)=" + body.bhWeightKg)
             System.out.println("身高(cm)=" + body.bhHeightCm)
             System.out.println("年齡(歲)=" + body.bhAge)
-            System.out.println("性別=" + BhSex.values().get(body.bhSex))
+            System.out.println("性別=" + com.besthealth.bh5BodyComposition.BhSex.values().get(body.bhSex))
             System.out.println("bhProduct=" + body.bhProduct)
             System.out.println("加密阻抗-100Khz右手=" + body.bhZ100KhzRightArmEnCode)
             System.out.println("加密阻抗-100Khz左手=" + body.bhZ100KhzLeftArmEnCode)

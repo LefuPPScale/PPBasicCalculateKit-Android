@@ -9,11 +9,13 @@ def releaseTime() {
 
 def fileName
 
-def GROUP_ID = "com.lefu.htcalculatekit"
-def ARTIFACT_ID = "htcalculatekit"
+def GROUP_ID = "com.lefu.ppbasecalculatekit"
+def ARTIFACT_ID = "ppbasecalculatekit"
+def LIB_VERSION_CODE = 1
+def LIB_VERSION = "1.0.0"
 
 android {
-    namespace 'com.lefu.htcalculatekit'
+    namespace 'com.lefu.ppbasecalculatekit'
     compileSdkVersion 31
 
     compileOptions {
@@ -77,20 +79,6 @@ dependencies {
 
 }
 
-
-//上传到maven
-//apply plugin: 'maven'
-//uploadArchives {
-//    repositories.mavenDeployer {
-//        String deployPath = getProjectDir().absolutePath + "/../../maven/"
-//        repository(url: "file://${deployPath}")
-//        pom.groupId = GROUP_ID
-//        pom.artifactId = ARTIFACT_ID
-//        pom.version = LIB_VERSION
-//        pom.packaging = 'aar'
-//    }
-//}
-
 // 添加JAR打包任务
 task jar(type: Jar) {
     dependsOn 'compileReleaseJavaWithJavac'
@@ -144,20 +132,20 @@ afterEvaluate {
             maven {
                 // 发布到指定的maven目录
                 url = uri("${rootProject.projectDir}/maven")
-                
+
                 // 确保目录存在
                 allowInsecureProtocol = true
             }
         }
     }
-    
+
     // 自定义AAR文件名
     tasks.withType(Zip) { task ->
         if (task.name.contains('bundleReleaseAar')) {
             task.archiveFileName = "${ARTIFACT_ID}-${LIB_VERSION}.aar"
         }
     }
-    
+
     // 创建自定义任务来清理AAR文件
     task cleanAarFiles {
         doLast {
@@ -167,7 +155,7 @@ afterEvaluate {
             }
         }
     }
-    
+
     // 清理Maven发布的AAR文件
     task cleanMavenAarFiles {
         doLast {
@@ -177,38 +165,38 @@ afterEvaluate {
             }
         }
     }
-    
+
     // 通用的AAR清理闭包
     ext.cleanAarFile = { File aarFile ->
         def tempDir = file("build/temp-aar-${System.currentTimeMillis()}")
         tempDir.deleteDir()
         tempDir.mkdirs()
-        
+
         // 解压AAR
         copy {
             from zipTree(aarFile)
             into tempDir
         }
-        
+
         // 删除不需要的文件
         delete file("${tempDir}/R.txt")
         delete file("${tempDir}/AndroidManifest.xml")
         // 完全删除META-INF目录
         delete file("${tempDir}/META-INF")
-        
+
         // 处理classes.jar中的META-INF
         def classesJar = file("${tempDir}/classes.jar")
         if (classesJar.exists()) {
             def classesTemp = file("build/temp-classes-${System.currentTimeMillis()}")
             classesTemp.deleteDir()
             classesTemp.mkdirs()
-            
+
             // 解压classes.jar
             copy {
                 from zipTree(classesJar)
                 into classesTemp
             }
-            
+
             // 删除classes.jar中的META-INF目录中的非必要文件，保留MANIFEST.MF
             def metaInfDir = file("${classesTemp}/META-INF")
             if (metaInfDir.exists()) {
@@ -218,26 +206,26 @@ afterEvaluate {
                     }
                 }
             }
-            
+
             // 重新打包classes.jar
             ant.jar(destfile: classesJar, basedir: classesTemp)
-            
+
             // 清理临时目录
             classesTemp.deleteDir()
         }
-        
+
         // 重新打包AAR
         ant.zip(destfile: aarFile, basedir: tempDir)
-        
+
         // 清理临时目录
         tempDir.deleteDir()
     }
-    
+
     // 在bundleReleaseAar任务后执行清理
     tasks.named('bundleReleaseAar').configure {
         finalizedBy cleanAarFiles
     }
-    
+
     // 在publishToMavenLocal任务后执行Maven AAR清理
     tasks.named('publishToMavenLocal').configure {
         finalizedBy cleanMavenAarFiles
