@@ -1,4 +1,4 @@
-package com.lefu.ppbasecalculatekit
+package com.lefu.ppbasiccalculatekit
 
 enum class HTErrorType {
 

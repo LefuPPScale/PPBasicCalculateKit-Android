@@ -1,4 +1,4 @@
-package com.lefu.ppbasecalculatekit
+package com.lefu.ppbasiccalculatekit
 
     /**
      * 计算方式 默认体脂率采用原始值

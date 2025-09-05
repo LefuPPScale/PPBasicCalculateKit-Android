@@ -1,80 +1,52 @@
-package com.lefu.ppbasecalculatekit.calculate
+package com.lefu.ppbasiccalculatekit.calculate
 
-import com.besthealth.bh3BodyComposition.BhErrorType
-import com.besthealth.bh3BodyComposition.BhSex
-import com.besthealth.bh3BodyComposition.BhTwoLegs240
+import com.besthealth.bh1BodyComposition.BhTwoLegs140
+import com.besthealth.bhBodyComposition.BhErrorType
 import com.besthealth.bhBodyComposition.BhPeopleType
-import com.lefu.ppbasecalculatekit.BodyFatCalculateHelper
-import com.lefu.ppbasecalculatekit.BodyFatErrorType
-import com.lefu.ppbasecalculatekit.HTBodyBaseModel
-import com.lefu.ppbasecalculatekit.HTBodyFatModel
-import com.lefu.ppbasecalculatekit.assignHTBodyBaseModelToBodyFatModel
-import com.lefu.ppbasecalculatekit.createList
+import com.besthealth.bhBodyComposition.BhSex
+import com.lefu.ppbasiccalculatekit.BodyFatCalculateHelper
+import com.lefu.ppbasiccalculatekit.BodyFatErrorType
+import com.lefu.ppbasiccalculatekit.HTBodyBaseModel
+import com.lefu.ppbasiccalculatekit.HTBodyFatModel
+import com.lefu.ppbasiccalculatekit.assignHTBodyBaseModelToBodyFatModel
+import com.lefu.ppbasiccalculatekit.createList
 
-object CalculateHelper4TwoChannel {
+object CalculateHelper4Leg2 {
 
     /**
-     * 4电极双频
+     * 4电极双脚阻抗-新
      *
      * @param bodyBaseModel
      * @param bodyFatModel
      */
-    fun calcuteTypeAlternate4TwoChannel(bodyBaseModel: HTBodyBaseModel): HTBodyFatModel {
+    fun calcuteTypeAlternateTwoLegs2(bodyBaseModel: HTBodyBaseModel): HTBodyFatModel {
         val bodyFatModel = HTBodyFatModel()
 
         assignHTBodyBaseModelToBodyFatModel(bodyBaseModel, bodyFatModel)
 
-        val body = BhTwoLegs240()
+        val body = BhTwoLegs140()
         bodyFatModel.ppSDKVersion = body.getSDKVersion()
         body.secret = bodyBaseModel.secret
         body.bhAge = bodyBaseModel.age
         body.bhHeightCm = bodyBaseModel.height * 1.0f
         body.bhWeightKg = bodyFatModel.ppWeightKg
-        body.bhSex = if (bodyBaseModel.sex == 1) com.besthealth.bhBodyComposition.BhSex.MALE.ordinal else com.besthealth.bhBodyComposition.BhSex.FEMALE.ordinal
+        body.bhSex = if (bodyBaseModel.sex == 1) BhSex.MALE.ordinal else BhSex.FEMALE.ordinal
         body.bhPeopleType = if (bodyBaseModel.isAthleteMode ?: false) BhPeopleType.ATHLETE.ordinal else BhPeopleType.NORMAL.ordinal
-        body.bhZTwoLegsEnCode50Khz = bodyBaseModel.impedance
-        if (bodyBaseModel.ppImpedance100EnCode == 0L) {
-            bodyBaseModel.ppImpedance100EnCode = bodyBaseModel.impedance
-        }
-        body.bhZTwoLegsEnCode100Khz = bodyBaseModel.ppImpedance100EnCode
+        body.bhZTwoLegsEnCode = bodyBaseModel.impedance
         val bhErrorType: BhErrorType = BhErrorType.values().get(body.getBodyComposition())
-        bodyFatModel.errorType = BodyFatCalculateHelper.calculateHTErrorTypeTwoChannel(bhErrorType).getType()
-        if (bodyBaseModel.impedance <= 0) {
-            bodyFatModel.errorType = BodyFatErrorType.PP_ERROR_TYPE_IMPEDANCE_TWO_LEGS.getType()
-        }
-        println("erropType：$bhErrorType")
+        println("impedance：" + bodyBaseModel.impedance)
+        println("错误信息：$bhErrorType")
         System.out.println(body.getSDKVersion())
-        System.out.println("Weight(Kg)=" + body.bhWeightKg)
-        System.out.println("Height(cm)=" + body.bhHeightCm)
-        System.out.println("Age=" + body.bhAge)
-        System.out.println("Sex=" + BhSex.values().get(body.bhSex))
-        System.out.println("PeopleType=" + body.bhPeopleType)
-        System.out.println("bhZTwoLegsEnCode50Khz=" + body.bhZTwoLegsEnCode50Khz)
-        System.out.println("bhZTwoLegsEnCode100Khz=" + body.bhZTwoLegsEnCode100Khz)
-        System.out.println("bhZTwoLegsDeCode50Khz(Ω)=" + body.bhZTwoLegsDeCode50Khz)
-        System.out.println("bhZTwoLegsDeCode100Khz(Ω)=" + body.bhZTwoLegsDeCode100Khz)
-        System.out.println("bodyFatModel.errorType=" + bodyFatModel.errorType)
+        bodyFatModel.errorType = BodyFatCalculateHelper.calculateHTErrorType4AC(bhErrorType).getType()
         if (bodyFatModel.errorType == BodyFatErrorType.PP_ERROR_TYPE_NONE.getType()) {
-            System.out.println("bhWaterRate=" + body.bhWaterRate)
-            System.out.println("BodyType=" + body.bhBodyType)
-            System.out.println("BodyFat=" + body.bhBodyFatRate)
-            System.out.println("bhBMI=" + body.bhBMI)
-            System.out.println("bhBodyFatSubCutRate=" + body.bhBodyFatSubCutRate)
-            System.out.println("bhMuscleKg=" + body.bhMuscleKg)
-            System.out.println("bhBoneKg=" + body.bhBoneKg)
-            System.out.println("bhBodyFatKg=" + body.bhBodyFatKg)
-            System.out.println("bhBodyFatFreeMassKg=" + body.bhBodyFatFreeMassKg)
-            System.out.println("bhMuscleRate=" + body.bhMuscleRate)
-            System.out.println("bhSkeletalMuscleKg=" + body.bhSkeletalMuscleKg)
-            System.out.println("bhBodyScore=" + body.bhBodyScore)
-            System.out.println("bhVFAL=" + body.bhVFAL)
-            System.out.println("bhIdealWeightKg=" + body.bhIdealWeightKg)
-            System.out.println("bhProteinRate=" + body.bhProteinRate)
-            System.out.println("bhSkeletalMuscleKg=" + body.bhSkeletalMuscleKg)
-            System.out.println("bhBodyAge=" + body.bhBodyAge)
-
-            bodyBaseModel.zTwoLegsDeCode = body.bhZTwoLegsDeCode50Khz
-            bodyBaseModel.ppImpedance100DeCode = body.bhZTwoLegsDeCode100Khz
+            System.out.println("體重(Kg)=" + body.bhWeightKg)
+            System.out.println("身高(cm)=" + body.bhHeightCm)
+            System.out.println("年齡(歲)=" + body.bhAge)
+            System.out.println("性別=" + BhSex.values().get(body.bhSex))
+            System.out.println("用戶類型=" + body.bhPeopleType)
+            System.out.println("加密阻抗-雙腳=" + body.bhZTwoLegsEnCode)
+            System.out.println("解密阻抗-雙腳(Ω)=" + body.bhZTwoLegsDeCode)
+            bodyFatModel.zTwoLegsDeCode = body.bhZTwoLegsDeCode
             bodyFatModel.ppProteinPercentage = body.bhProteinRate
             bodyFatModel.ppIdealWeightKg = body.bhIdealWeightKg
             bodyFatModel.ppBMI = if (body.bhBMI >= 10) body.bhBMI else 10.0f
@@ -87,13 +59,13 @@ object CalculateHelper4TwoChannel {
             bodyFatModel.ppBodyScore = body.bhBodyScore
             bodyFatModel.ppMusclePercentage = body.bhMuscleRate
             bodyFatModel.ppBodySkeletalKg = body.bhSkeletalMuscleKg
+            bodyFatModel.ppBodySkeletal = bodyFatModel.ppBodySkeletalKg / bodyFatModel.ppWeightKg * 100f
+            bodyFatModel.ppBodyfatKg = bodyFatModel.ppFat * 0.01f * bodyFatModel.ppWeightKg
             bodyFatModel.ppBodyStandardWeightKg = body.bhIdealWeightKg
             bodyFatModel.ppIdealWeightKg = body.bhIdealWeightKg
             bodyFatModel.ppLoseFatWeightKg = bodyFatModel.ppWeightKg - bodyFatModel.ppBodyfatKg
 
-            bodyFatModel.ppBodyAge = body.bhBodyAge
             bodyFatModel.ppMuscleKgList = createList(body.bhMuscleKgListUnderOrStandard, body.bhMuscleKgListStandardOrExcellent)
-
             bodyFatModel.ppMusclePercentageList = createList(body.bhMuscleKgListUnderOrStandard, body.bhMuscleKgListStandardOrExcellent)
             bodyFatModel.ppWaterPercentageList = createList(body.bhWaterRateListUnderOrStandard, body.bhWaterRateListStandardOrExcellent)
             bodyFatModel.ppWaterKgList = createList(body.bhWaterRateListUnderOrStandard, body.bhWaterRateListStandardOrExcellent)
@@ -127,12 +99,12 @@ object CalculateHelper4TwoChannel {
             bodyFatModel.ppBodyFatSubCutPercentageList = bhBodyFatSubCutRateList
             bodyFatModel.ppBodyFatSubCutKgList = bhBodyFatSubCutRateList
             bodyFatModel.ppBMRList = bhBMRList
-
         } else {
 
         }
         return bodyFatModel
     }
+
 
 
 }

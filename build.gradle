@@ -1,4 +1,4 @@
-apply from: './ppbasecalculatekit.gradle'
+apply from: './ppbasiccalculatekit.gradle'
 
 
 

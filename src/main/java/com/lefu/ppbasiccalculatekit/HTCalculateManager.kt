@@ -1,12 +1,12 @@
-package com.lefu.ppbasecalculatekit
+package com.lefu.ppbasiccalculatekit
 
-import com.lefu.ppbasecalculatekit.calculate.CalculateHelper4
-import com.lefu.ppbasecalculatekit.calculate.CalculateHelper4Leg2
-import com.lefu.ppbasecalculatekit.calculate.CalculateHelper4TwoArms
-import com.lefu.ppbasecalculatekit.calculate.CalculateHelper4TwoChannel
-import com.lefu.ppbasecalculatekit.calculate.CalculateHelper8
-import com.lefu.ppbasecalculatekit.calculate.CalculateHelper8Smooth
-import com.lefu.ppbasecalculatekit.calculate.CalculateHelper8_172
+import com.lefu.ppbasiccalculatekit.calculate.CalculateHelper4
+import com.lefu.ppbasiccalculatekit.calculate.CalculateHelper4Leg2
+import com.lefu.ppbasiccalculatekit.calculate.CalculateHelper4TwoArms
+import com.lefu.ppbasiccalculatekit.calculate.CalculateHelper4TwoChannel
+import com.lefu.ppbasiccalculatekit.calculate.CalculateHelper8
+import com.lefu.ppbasiccalculatekit.calculate.CalculateHelper8Smooth
+import com.lefu.ppbasiccalculatekit.calculate.CalculateHelper8_172
 
 object HTCalculateManager {
 

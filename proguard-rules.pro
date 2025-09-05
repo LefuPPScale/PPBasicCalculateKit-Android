@@ -30,8 +30,8 @@
 
 -keep class com.lefu.body_sl.** {*;}
 -keep enum com.lefu.body_sl.** {*;}
--keep enum com.lefu.ppbasecalculatekit.** {*;}
--keep class com.lefu.ppbasecalculatekit.** {*;}
+-keep enum com.lefu.ppbasiccalculatekit.** {*;}
+-keep class com.lefu.ppbasiccalculatekit.** {*;}
 
 -keep class com.besthealth.bhBodyComposition.** {*;}
 -keep class com.besthealth.bh1BodyComposition.** {*;}

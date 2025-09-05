@@ -1,16 +1,16 @@
-package com.lefu.ppbasecalculatekit.calculate
+package com.lefu.ppbasiccalculatekit.calculate
 
 import com.besthealth.bhBodyComposition.BhErrorType
 import com.besthealth.bhBodyComposition.BhPeopleType
 import com.besthealth.bhBodyComposition.BhSex
 import com.besthealth.bhBodyComposition.BhTwoLegs140
-import com.lefu.ppbasecalculatekit.BodyFatCalculateHelper
-import com.lefu.ppbasecalculatekit.BodyFatErrorType
-import com.lefu.ppbasecalculatekit.HTBodyBaseModel
-import com.lefu.ppbasecalculatekit.HTBodyFatModel
-import com.lefu.ppbasecalculatekit.assignHTBodyBaseModelToBodyFatModel
-import com.lefu.ppbasecalculatekit.body_sl.LFPeopleGeneral
-import com.lefu.ppbasecalculatekit.createList
+import com.lefu.ppbasiccalculatekit.BodyFatCalculateHelper
+import com.lefu.ppbasiccalculatekit.BodyFatErrorType
+import com.lefu.ppbasiccalculatekit.HTBodyBaseModel
+import com.lefu.ppbasiccalculatekit.HTBodyFatModel
+import com.lefu.ppbasiccalculatekit.assignHTBodyBaseModelToBodyFatModel
+import com.lefu.ppbasiccalculatekit.body_sl.LFPeopleGeneral
+import com.lefu.ppbasiccalculatekit.createList
 
 object CalculateHelper4 {
 

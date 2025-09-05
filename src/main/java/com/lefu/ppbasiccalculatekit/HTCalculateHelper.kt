@@ -1,4 +1,4 @@
-package com.lefu.ppbasecalculatekit
+package com.lefu.ppbasiccalculatekit
 
 fun createList(vararg args: Float?): List<Float> {
     val list = mutableListOf<Float>()

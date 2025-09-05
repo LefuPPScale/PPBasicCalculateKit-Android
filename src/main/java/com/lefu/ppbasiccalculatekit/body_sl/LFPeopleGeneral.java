@@ -1,4 +1,4 @@
-package com.lefu.ppbasecalculatekit.body_sl;
+package com.lefu.ppbasiccalculatekit.body_sl;
 
 import com.lefu.body_sl.BodyInput;
 import com.lefu.body_sl.BodyOutput;

@@ -1,52 +1,53 @@
-package com.lefu.ppbasecalculatekit.calculate
+package com.lefu.ppbasiccalculatekit.calculate
 
-import com.besthealth.bh1BodyComposition.BhTwoLegs140
-import com.besthealth.bhBodyComposition.BhErrorType
+import com.besthealth.bh4BodyComposition.BhErrorType
+import com.besthealth.bh4BodyComposition.BhSex
+import com.besthealth.bh4BodyComposition.BhTwoArms140
 import com.besthealth.bhBodyComposition.BhPeopleType
-import com.besthealth.bhBodyComposition.BhSex
-import com.lefu.ppbasecalculatekit.BodyFatCalculateHelper
-import com.lefu.ppbasecalculatekit.BodyFatErrorType
-import com.lefu.ppbasecalculatekit.HTBodyBaseModel
-import com.lefu.ppbasecalculatekit.HTBodyFatModel
-import com.lefu.ppbasecalculatekit.assignHTBodyBaseModelToBodyFatModel
-import com.lefu.ppbasecalculatekit.createList
+import com.lefu.ppbasiccalculatekit.BodyFatCalculateHelper
+import com.lefu.ppbasiccalculatekit.BodyFatErrorType
+import com.lefu.ppbasiccalculatekit.HTBodyBaseModel
+import com.lefu.ppbasiccalculatekit.HTBodyFatModel
+import com.lefu.ppbasiccalculatekit.assignHTBodyBaseModelToBodyFatModel
+import com.lefu.ppbasiccalculatekit.createList
 
-object CalculateHelper4Leg2 {
+object CalculateHelper4TwoArms {
 
     /**
-     * 4电极双脚阻抗-新
+     * 双手算法
      *
      * @param bodyBaseModel
      * @param bodyFatModel
      */
-    fun calcuteTypeAlternateTwoLegs2(bodyBaseModel: HTBodyBaseModel): HTBodyFatModel {
+    fun calcuteTypeAlternateTwoArms(bodyBaseModel: HTBodyBaseModel): HTBodyFatModel {
+
         val bodyFatModel = HTBodyFatModel()
 
         assignHTBodyBaseModelToBodyFatModel(bodyBaseModel, bodyFatModel)
 
-        val body = BhTwoLegs140()
+        val body = BhTwoArms140()
         bodyFatModel.ppSDKVersion = body.getSDKVersion()
         body.secret = bodyBaseModel.secret
         body.bhAge = bodyBaseModel.age
         body.bhHeightCm = bodyBaseModel.height * 1.0f
         body.bhWeightKg = bodyFatModel.ppWeightKg
-        body.bhSex = if (bodyBaseModel.sex == 1) BhSex.MALE.ordinal else BhSex.FEMALE.ordinal
+        body.bhSex = if (bodyBaseModel.sex == 1) com.besthealth.bhBodyComposition.BhSex.MALE.ordinal else com.besthealth.bhBodyComposition.BhSex.FEMALE.ordinal
         body.bhPeopleType = if (bodyBaseModel.isAthleteMode ?: false) BhPeopleType.ATHLETE.ordinal else BhPeopleType.NORMAL.ordinal
-        body.bhZTwoLegsEnCode = bodyBaseModel.impedance
+        body.bhZTwoArmsEnCode = bodyBaseModel.impedance
         val bhErrorType: BhErrorType = BhErrorType.values().get(body.getBodyComposition())
         println("impedance：" + bodyBaseModel.impedance)
         println("错误信息：$bhErrorType")
         System.out.println(body.getSDKVersion())
-        bodyFatModel.errorType = BodyFatCalculateHelper.calculateHTErrorType4AC(bhErrorType).getType()
+        bodyFatModel.errorType = BodyFatCalculateHelper.calculateHTErrorTypeTwoArms(bhErrorType).getType()
         if (bodyFatModel.errorType == BodyFatErrorType.PP_ERROR_TYPE_NONE.getType()) {
             System.out.println("體重(Kg)=" + body.bhWeightKg)
             System.out.println("身高(cm)=" + body.bhHeightCm)
             System.out.println("年齡(歲)=" + body.bhAge)
             System.out.println("性別=" + BhSex.values().get(body.bhSex))
             System.out.println("用戶類型=" + body.bhPeopleType)
-            System.out.println("加密阻抗-雙腳=" + body.bhZTwoLegsEnCode)
-            System.out.println("解密阻抗-雙腳(Ω)=" + body.bhZTwoLegsDeCode)
-            bodyFatModel.zTwoLegsDeCode = body.bhZTwoLegsDeCode
+            System.out.println("加密阻抗-雙手50Khz(Ω)=" + body.bhZTwoArmsEnCode)
+            System.out.println("解密阻抗-雙手50Khz(Ω)=" + body.bhZTwoArmsDeCode)
+            bodyBaseModel.zTwoLegsDeCode = body.bhZTwoArmsDeCode
             bodyFatModel.ppProteinPercentage = body.bhProteinRate
             bodyFatModel.ppIdealWeightKg = body.bhIdealWeightKg
             bodyFatModel.ppBMI = if (body.bhBMI >= 10) body.bhBMI else 10.0f
@@ -59,11 +60,9 @@ object CalculateHelper4Leg2 {
             bodyFatModel.ppBodyScore = body.bhBodyScore
             bodyFatModel.ppMusclePercentage = body.bhMuscleRate
             bodyFatModel.ppBodySkeletalKg = body.bhSkeletalMuscleKg
-            bodyFatModel.ppBodySkeletal = bodyFatModel.ppBodySkeletalKg / bodyFatModel.ppWeightKg * 100f
-            bodyFatModel.ppBodyfatKg = bodyFatModel.ppFat * 0.01f * bodyFatModel.ppWeightKg
             bodyFatModel.ppBodyStandardWeightKg = body.bhIdealWeightKg
             bodyFatModel.ppIdealWeightKg = body.bhIdealWeightKg
-            bodyFatModel.ppLoseFatWeightKg = bodyFatModel.ppWeightKg - bodyFatModel.ppBodyfatKg
+            bodyFatModel.ppLoseFatWeightKg = body.bhBodyFatFreeMassKg
 
             bodyFatModel.ppMuscleKgList = createList(body.bhMuscleKgListUnderOrStandard, body.bhMuscleKgListStandardOrExcellent)
             bodyFatModel.ppMusclePercentageList = createList(body.bhMuscleKgListUnderOrStandard, body.bhMuscleKgListStandardOrExcellent)
@@ -104,7 +103,5 @@ object CalculateHelper4Leg2 {
         }
         return bodyFatModel
     }
-
-
 
 }

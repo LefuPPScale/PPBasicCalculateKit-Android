@@ -1,4 +1,4 @@
-package com.lefu.ppbasecalculatekit
+package com.lefu.ppbasiccalculatekit
 
 import com.besthealth.bhBodyComposition.BhErrorType
 import com.lefu.body_sl.ErrorType

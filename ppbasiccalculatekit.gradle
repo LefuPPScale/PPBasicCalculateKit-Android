@@ -9,13 +9,13 @@ def releaseTime() {
 
 def fileName
 
-def GROUP_ID = "com.lefu.ppbasecalculatekit"
-def ARTIFACT_ID = "ppbasecalculatekit"
+def GROUP_ID = "com.lefu.ppbasiccalculatekit"
+def ARTIFACT_ID = "ppbasiccalculatekit"
 def LIB_VERSION_CODE = 1
 def LIB_VERSION = "1.0.0"
 
 android {
-    namespace 'com.lefu.ppbasecalculatekit'
+    namespace 'com.lefu.ppbasiccalculatekit'
     compileSdkVersion 31
 
     compileOptions {
