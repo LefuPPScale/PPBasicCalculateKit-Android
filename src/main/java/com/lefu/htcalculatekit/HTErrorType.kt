@@ -1,0 +1,21 @@
+package com.lefu.htcalculatekit
+
+enum class HTErrorType {
+
+    NONE,
+    AGE,
+    HEIGHT,
+    WEIGHT,
+    SEX,
+    PEOPLE_TYPE,
+    IMPEDANCE_TWO_LEGS,
+    IMPEDANCE_TWO_ARMS,
+    IMPEDANCE_LEFT_BODY,
+    IMPEDANCE_LEFT_ARM,
+    IMPEDANCE_RIGHT_ARM,
+    IMPEDANCE_LEFT_LEG,
+    IMPEDANCE_RIGHT_LEG,
+    IMPEDANCE_TRUNK,
+    HOME,
+    PRODUCT;
+}

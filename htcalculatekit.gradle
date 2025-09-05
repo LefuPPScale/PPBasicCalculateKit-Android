@@ -1,0 +1,262 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
+
+def releaseTime() {
+//GMT+8代表北京时间
+    return new Date().format("yyyyMMdd", TimeZone.getTimeZone("GMT+8"))
+}
+
+def fileName
+
+def GROUP_ID = "com.lefu.htcalculatekit"
+def ARTIFACT_ID = "htcalculatekit"
+
+android {
+    namespace 'com.lefu.htcalculatekit'
+    compileSdkVersion 31
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+
+    defaultConfig {
+        minSdkVersion 18
+        versionCode LIB_VERSION_CODE as int
+        versionName LIB_VERSION
+
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            android.libraryVariants.all { variant ->
+                variant.outputs.all { output ->
+                    def f = output.outputFileName
+                    if (f != null && f.endsWith('.aar')) {
+                        fileName = "${ARTIFACT_ID}_v${defaultConfig.versionName}_${releaseTime()}.aar"
+                        output.outputFileName = fileName
+                    }
+                }
+            }
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            android.libraryVariants.all { variant ->
+                variant.outputs.all { output ->
+                    def f = output.outputFileName
+                    if (f != null && f.endsWith('.aar')) {
+                        fileName = "${ARTIFACT_ID}_v${defaultConfig.versionName}_${releaseTime()}.aar"
+                        output.outputFileName = fileName
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+dependencies {
+    api fileTree(include: ['*.jar', '*.aar'], dir: 'libs')
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+
+}
+
+
+//上传到maven
+//apply plugin: 'maven'
+//uploadArchives {
+//    repositories.mavenDeployer {
+//        String deployPath = getProjectDir().absolutePath + "/../../maven/"
+//        repository(url: "file://${deployPath}")
+//        pom.groupId = GROUP_ID
+//        pom.artifactId = ARTIFACT_ID
+//        pom.version = LIB_VERSION
+//        pom.packaging = 'aar'
+//    }
+//}
+
+// 添加JAR打包任务
+task jar(type: Jar) {
+    dependsOn 'compileReleaseJavaWithJavac'
+    from(fileTree(dir: 'build/intermediates/javac/release/classes')) {
+        exclude 'META-INF/**'
+    }
+    from(fileTree(dir: 'src/main/assets')) {
+        into 'assets'
+    }
+//    // 添加libs目录下的JAR文件内容
+//    from(zipTree('libs/bluetoothkit-1.5.4.jar')) {
+//        exclude 'META-INF/**'
+//    }
+    // 完全排除META-INF目录
+    exclude 'META-INF/**'
+    archiveFileName = "${project.name}-${version}.jar"
+    destinationDirectory = file('build/libs')
+    // 禁用MANIFEST.MF生成
+    metaInf {
+        exclude '**'
+    }
+    doLast {
+        // 在JAR包生成后删除META-INF目录
+        def jarFile = archiveFile.get().asFile
+        if (jarFile.exists()) {
+            exec {
+                commandLine 'zip', '-d', jarFile.absolutePath, 'META-INF/*'
+                ignoreExitValue = true
+            }
+        }
+    }
+}
+
+// 配置发布
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // 发布JAR文件而不是AAR
+                artifact jar
+
+                // 自定义你的包信息
+                groupId = GROUP_ID
+                artifactId = ARTIFACT_ID
+                version = LIB_VERSION
+
+            }
+        }
+
+        repositories {
+            maven {
+                // 发布到指定的maven目录
+                url = uri("${rootProject.projectDir}/maven")
+                
+                // 确保目录存在
+                allowInsecureProtocol = true
+            }
+        }
+    }
+    
+    // 自定义AAR文件名
+    tasks.withType(Zip) { task ->
+        if (task.name.contains('bundleReleaseAar')) {
+            task.archiveFileName = "${ARTIFACT_ID}-${LIB_VERSION}.aar"
+        }
+    }
+    
+    // 创建自定义任务来清理AAR文件
+    task cleanAarFiles {
+        doLast {
+            def aarFile = file("build/outputs/aar/${ARTIFACT_ID}-${LIB_VERSION}.aar")
+            if (aarFile.exists()) {
+                cleanAarFile(aarFile)
+            }
+        }
+    }
+    
+    // 清理Maven发布的AAR文件
+    task cleanMavenAarFiles {
+        doLast {
+            def mavenAarFile = file("${project.rootDir}/maven/com/lefu/htcalculatekit/${ARTIFACT_ID}/${versionName}/${ARTIFACT_ID}-${versionName}.aar")
+            if (mavenAarFile.exists()) {
+                cleanAarFile(mavenAarFile)
+            }
+        }
+    }
+    
+    // 通用的AAR清理闭包
+    ext.cleanAarFile = { File aarFile ->
+        def tempDir = file("build/temp-aar-${System.currentTimeMillis()}")
+        tempDir.deleteDir()
+        tempDir.mkdirs()
+        
+        // 解压AAR
+        copy {
+            from zipTree(aarFile)
+            into tempDir
+        }
+        
+        // 删除不需要的文件
+        delete file("${tempDir}/R.txt")
+        delete file("${tempDir}/AndroidManifest.xml")
+        // 完全删除META-INF目录
+        delete file("${tempDir}/META-INF")
+        
+        // 处理classes.jar中的META-INF
+        def classesJar = file("${tempDir}/classes.jar")
+        if (classesJar.exists()) {
+            def classesTemp = file("build/temp-classes-${System.currentTimeMillis()}")
+            classesTemp.deleteDir()
+            classesTemp.mkdirs()
+            
+            // 解压classes.jar
+            copy {
+                from zipTree(classesJar)
+                into classesTemp
+            }
+            
+            // 删除classes.jar中的META-INF目录中的非必要文件，保留MANIFEST.MF
+            def metaInfDir = file("${classesTemp}/META-INF")
+            if (metaInfDir.exists()) {
+                metaInfDir.listFiles().each { file ->
+                    if (file.name != 'MANIFEST.MF') {
+                        file.delete()
+                    }
+                }
+            }
+            
+            // 重新打包classes.jar
+            ant.jar(destfile: classesJar, basedir: classesTemp)
+            
+            // 清理临时目录
+            classesTemp.deleteDir()
+        }
+        
+        // 重新打包AAR
+        ant.zip(destfile: aarFile, basedir: tempDir)
+        
+        // 清理临时目录
+        tempDir.deleteDir()
+    }
+    
+    // 在bundleReleaseAar任务后执行清理
+    tasks.named('bundleReleaseAar').configure {
+        finalizedBy cleanAarFiles
+    }
+    
+    // 在publishToMavenLocal任务后执行Maven AAR清理
+    tasks.named('publishToMavenLocal').configure {
+        finalizedBy cleanMavenAarFiles
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
