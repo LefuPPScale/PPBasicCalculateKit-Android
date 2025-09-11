@@ -6,7 +6,9 @@
 - 将此module作为lib引入到你的项目中，
 
 2、如何拿到计算后的体脂数据
-PPBasicCalculateKit是基础的计算库计算，在你配置Secret完成后，你需要引入PPBaseKit/PPDataAnalysisKit/PPBluetoothKit三个模块，
-在你调用PPBasicCalculateKit计算出来体脂信息后会返回一个Json，将该Json再调用PPDataAnalysisKit库，拿到PPBodyFatModel至此PPBodyFatModel就是完成的体脂信息。
+PPBasicCalculateKit是PPCalculateKit的基础计算库，
+PPBaseKit/PPBasicCalculateKit/PPCalculateKit三个模块都需要引入到你的项目中，
+其中PPBasicCalculateKit采用library方式引入，PPBaseKit&PPCalculateKit采用aar/maven方式引入，
+
 具体的计算库可查看文档：
 https://xinzhiyun.feishu.cn/docx/L0UxdNKFPorB77xBjnmcqijtnVb?from=from_copylink
