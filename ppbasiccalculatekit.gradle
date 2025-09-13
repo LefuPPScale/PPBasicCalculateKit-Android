@@ -11,8 +11,8 @@ def fileName
 
 def GROUP_ID = "com.lefu.ppbasiccalculatekit"
 def ARTIFACT_ID = "ppbasiccalculatekit"
-def LIB_VERSION_CODE = 1
-def LIB_VERSION = "1.0.0"
+def LIB_VERSION_CODE = 2
+def LIB_VERSION = "1.1.0"
 
 android {
     namespace 'com.lefu.ppbasiccalculatekit'
@@ -42,31 +42,15 @@ android {
     }
 
     buildTypes {
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            android.libraryVariants.all { variant ->
-                variant.outputs.all { output ->
-                    def f = output.outputFileName
-                    if (f != null && f.endsWith('.aar')) {
-                        fileName = "${ARTIFACT_ID}_v${defaultConfig.versionName}_${releaseTime()}.aar"
-                        output.outputFileName = fileName
-                    }
-                }
-            }
-        }
         debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            android.libraryVariants.all { variant ->
-                variant.outputs.all { output ->
-                    def f = output.outputFileName
-                    if (f != null && f.endsWith('.aar')) {
-                        fileName = "${ARTIFACT_ID}_v${defaultConfig.versionName}_${releaseTime()}.aar"
-                        output.outputFileName = fileName
-                    }
-                }
-            }
+            debuggable false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            debuggable false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -79,127 +63,36 @@ dependencies {
 
 }
 
-// JAR打包任务已移除，改为使用AAR
 
 // 配置发布
 afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                // 发布AAR文件，不包含sources
-                artifact("$buildDir/outputs/aar/${ARTIFACT_ID}-${LIB_VERSION}.aar")
+                // 只发布aar文件，不包含.module和sources
+                artifact("$buildDir/outputs/aar/${ARTIFACT_ID}-release.aar")
 
                 // 自定义你的包信息
                 groupId = GROUP_ID
                 artifactId = ARTIFACT_ID
                 version = LIB_VERSION
-
             }
         }
 
         repositories {
             maven {
-                // 发布到指定的maven目录
+                // 指定绝对路径到项目根目录下的maven文件夹
                 url = uri("${rootProject.projectDir}/maven")
-
-                // 确保目录存在
-                allowInsecureProtocol = true
             }
         }
     }
 
-    // 自定义AAR文件名
-    tasks.withType(Zip) { task ->
-        if (task.name.contains('bundleReleaseAar')) {
-            task.archiveFileName = "${ARTIFACT_ID}-${LIB_VERSION}.aar"
-        }
-    }
-
-    // 创建自定义任务来清理AAR文件
-    task cleanAarFiles {
-        doLast {
-            def aarFile = file("build/outputs/aar/${ARTIFACT_ID}-${LIB_VERSION}.aar")
-            if (aarFile.exists()) {
-                cleanAarFile(aarFile)
-            }
-        }
-    }
-
-    // 清理Maven发布的AAR文件
-    task cleanMavenAarFiles {
-        doLast {
-            def mavenAarFile = file("${project.rootDir}/maven/com/lefu/htcalculatekit/${ARTIFACT_ID}/${versionName}/${ARTIFACT_ID}-${versionName}.aar")
-            if (mavenAarFile.exists()) {
-                cleanAarFile(mavenAarFile)
-            }
-        }
-    }
-
-    // 通用的AAR清理闭包
-    ext.cleanAarFile = { File aarFile ->
-        def tempDir = file("build/temp-aar-${System.currentTimeMillis()}")
-        tempDir.deleteDir()
-        tempDir.mkdirs()
-
-        // 解压AAR
-        copy {
-            from zipTree(aarFile)
-            into tempDir
-        }
-
-        // 删除不需要的文件
-        delete file("${tempDir}/R.txt")
-        delete file("${tempDir}/AndroidManifest.xml")
-        // 完全删除META-INF目录
-        delete file("${tempDir}/META-INF")
-
-        // 处理classes.jar中的META-INF
-        def classesJar = file("${tempDir}/classes.jar")
-        if (classesJar.exists()) {
-            def classesTemp = file("build/temp-classes-${System.currentTimeMillis()}")
-            classesTemp.deleteDir()
-            classesTemp.mkdirs()
-
-            // 解压classes.jar
-            copy {
-                from zipTree(classesJar)
-                into classesTemp
-            }
-
-            // 删除classes.jar中的META-INF目录中的非必要文件，保留MANIFEST.MF
-            def metaInfDir = file("${classesTemp}/META-INF")
-            if (metaInfDir.exists()) {
-                metaInfDir.listFiles().each { file ->
-                    if (file.name != 'MANIFEST.MF') {
-                        file.delete()
-                    }
-                }
-            }
-
-            // 重新打包classes.jar
-            ant.jar(destfile: classesJar, basedir: classesTemp)
-
-            // 清理临时目录
-            classesTemp.deleteDir()
-        }
-
-        // 重新打包AAR
-        ant.zip(destfile: aarFile, basedir: tempDir)
-
-        // 清理临时目录
-        tempDir.deleteDir()
-    }
-
-    // 在bundleReleaseAar任务后执行清理
-    tasks.named('bundleReleaseAar').configure {
-        finalizedBy cleanAarFiles
-    }
-
-    // 在publishToMavenLocal任务后执行Maven AAR清理
-    tasks.named('publishToMavenLocal').configure {
-        finalizedBy cleanMavenAarFiles
+    // 确保发布任务依赖于构建任务
+    tasks.withType(PublishToMavenRepository) {
+        dependsOn assembleRelease
     }
 }
+
 
 
 
